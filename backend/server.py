@@ -43,8 +43,9 @@ def post():
 
                 # Create a temp audio file
                 # temp_audio_file = tempfile.mktemp(suffix='.wav')
-                # with io.BytesIO(audio_clip.to_bytesio()) as audio_bytes:
-                #     audio_data = sr.AudioData(audio_bytes.read(), audio_clip.reader.nchannels, audio_clip.reader.sampling_rate)
+                # audio_clip.write_audiofile(temp_audio_file)
+                # with sr.AudioFile(temp_audio_file) as source:
+                #     audio_data = r.record(source)
                 #     text = r.recognize_google(audio_data)
                 # print('TEXT IS:',text)
 
