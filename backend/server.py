@@ -7,6 +7,8 @@ import os
 from transformers import pipeline
 from moviepy.editor import VideoFileClip,AudioFileClip
 
+# import TTS module from google
+from gtts import gTTS
 
 whisper = pipeline('automatic-speech-recognition', model='openai/whisper-large-v3')
 translator = Translator()
@@ -42,7 +44,7 @@ def post():
                 text=''
 
 
-                # # Create a temp audio file
+                # Create a temp audio file
                 temp_audio_file = tempfile.mktemp(suffix='.mp3')
                 audio_clip.write_audiofile(temp_audio_file)
                  # Transcribe the audio using Whisper
@@ -51,10 +53,22 @@ def post():
                 # text['text'] is deal
                 print('TEXT IS:', text['text'])
                 
-                translated_text = translator.translate(text['text'], dest='es')
+                translated_text = translator.translate(text['text'], dest='en')
                 print('translated text is: ',translated_text.text)
 
-                return send_file(output_path, as_attachment=True, download_name=f"{yt.title}.mp4")
+                # Create a temp file to keep track of audio this step requires some processing
+                tts =gTTS(translated_text.text,lang_check=True)
+                trans_audio_file =tempfile.mktemp(suffix='.mp4')
+                tts.save(trans_audio_file)
+
+                # Replace the original audio with translated audio
+                video_clip_with_translated_audio = video_clip.set_audio(AudioFileClip(trans_audio_file))
+
+                # Output the video with translated audio
+                output_video_path = tempfile.mktemp(suffix='.mp4')
+                video_clip_with_translated_audio.write_videofile(output_video_path, codec="libx264")
+
+                return send_file(output_video_path, as_attachment=True, download_name=f"{yt.title}.mp4")
             return jsonify({"error": f"No suitable stream found for resolution {resolution}"}), 400
         except Exception as e:
             return jsonify({"error": f'{str(e)} at line {e.__traceback__.tb_lineno}'}), 400
