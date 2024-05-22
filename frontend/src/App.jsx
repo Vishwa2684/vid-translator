@@ -14,6 +14,8 @@ function App() {
         const url = window.URL.createObjectURL(new Blob([response.data], { type: response.data.type }))
         setVideoSrc(url)
         setLoading(false)
+      }else{
+        setLoading(false)
       }
     } catch (error) {
       console.error("There was an error!", error)
@@ -30,7 +32,7 @@ function App() {
         placeholder='Enter video URL'
       />
 
-      {loading?<div>Loading...</div>:<button onClick={handleDownload}>Get Video</button>}
+      {loading?<div><h2>Loading...</h2></div>:<button onClick={handleDownload}>Get Video</button>}
       
       {videoSrc && (
         <video controls>
